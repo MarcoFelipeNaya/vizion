@@ -1,0 +1,27 @@
+-- Boards
+CREATE TABLE boards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Columns
+CREATE TABLE columns (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  board_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  position INT NOT NULL,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
+);
+
+-- Cards
+CREATE TABLE cards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  column_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  position INT NOT NULL,
+  color VARCHAR(7) DEFAULT '#8b5cf6',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (column_id) REFERENCES columns(id) ON DELETE CASCADE
+);
