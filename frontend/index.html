@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vizion</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Sidebar — board list -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo">Vizion</h1>
+      <p class="logo-sub">Visual project management</p>
+    </div>
+
+    <div class="sidebar-boards">
+      <div class="sidebar-title">
+        <span>Your Boards</span>
+        <button class="btn-icon" id="newBoardBtn" title="New board">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Board list renders here -->
+      <ul class="board-list" id="boardList"></ul>
+      <!-- Theme toggle at the bottom of sidebar -->
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+        <span id="themeLabel">Dark mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <h2 class="board-title" id="boardTitle">Select a board</h2>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </header>
+
+    <!-- Kanban columns render here -->
+    <div class="board-area" id="boardArea">
+      <div class="empty-state" id="emptyState">
+        <i class="fa-solid fa-table-columns"></i>
+        <p>Select or create a board to get started</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal — reused for boards, columns and cards -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">New Board</h3>
+        <button class="btn-icon" id="modalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const savedTheme = localStorage.getItem('vizion-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+
+
+</html>

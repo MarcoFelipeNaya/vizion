@@ -1,0 +1,25 @@
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const boardRoutes = require('./routes/boards');
+const columnRoutes = require('./routes/columns');
+const cardRoutes = require('./routes/cards');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/api/health', (req, res) => {
+  res.json({ message: 'Vizion is running!' });
+});
+
+app.use('/api/boards', boardRoutes);
+app.use('/api/columns', columnRoutes);
+app.use('/api/cards', cardRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Vizion running on http://localhost:${PORT}`);
+});
