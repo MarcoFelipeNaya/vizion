@@ -1,4 +1,4 @@
-const API = 'http://localhost:3000/api';
+const API = 'https://vizion-production-98ee.up.railway.app/api/';
 
 // ── Boards ────────────────────────────────────────
 
