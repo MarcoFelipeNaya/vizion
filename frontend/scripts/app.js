@@ -360,6 +360,16 @@ function createCardHTML(card) {
   `;
 }
 
+// ── Optimistic UI helpers ────────────────────────
+// Updates the column card count badge without a full re-render
+function updateColumnCount(columnCardsEl) {
+  if (!columnCardsEl) return;
+  const column = columnCardsEl.closest('.column');
+  if (!column) return;
+  const badge = column.querySelector('.column-count');
+  if (badge) badge.textContent = columnCardsEl.children.length;
+}
+
 // ── Card events (edit + delete) ───────────────────
 // Uses event delegation — one listener on boardArea handles all cards
 
@@ -405,13 +415,19 @@ boardArea.addEventListener('click', async (e) => {
     });
   }
 
-  // delete card
+  // delete card — optimistic: remove from DOM immediately, sync in background
   if (e.target.closest('.btn-delete-card')) {
     const btn = e.target.closest('.btn-delete-card');
     const id = btn.dataset.id;
     if (confirm('Delete this card?')) {
-      await deleteCard(id);
-      await loadColumns();
+      const cardEl = btn.closest('.card');
+      const columnCardsEl = cardEl.closest('.column-cards');
+      cardEl.remove();
+      updateColumnCount(columnCardsEl);
+      deleteCard(id).catch(() => {
+        // if the server call fails, reload to restore correct state
+        loadColumns();
+      });
     }
   }
 });
@@ -458,10 +474,22 @@ function initDragAndDrop() {
       zone.classList.remove('drag-over');
       const cardId = e.dataTransfer.getData('cardId');
       if (!cardId) return; // ignore column drops on card zones
+
+      // optimistic: move the card element in the DOM immediately
+      const cardEl = document.querySelector(`.card[data-id="${cardId}"]`);
+      if (!cardEl) return;
+      const sourceZone = cardEl.closest('.column-cards');
+      zone.appendChild(cardEl);
+      cardEl.dataset.columnId = zone.dataset.columnId;
+      updateColumnCount(sourceZone);
+      updateColumnCount(zone);
+
       const columnId = zone.dataset.columnId;
-      const position = zone.children.length;
-      await moveCard(cardId, columnId, position);
-      await loadColumns();
+      const position = zone.children.length - 1;
+      moveCard(cardId, columnId, position).catch(() => {
+        // if the server call fails, reload to restore correct state
+        loadColumns();
+      });
     });
   });
 
@@ -521,18 +549,17 @@ function initDragAndDrop() {
       ids.splice(fromIndex, 1);
       ids.splice(toIndex, 0, columnId);
 
-      // update position for each column in the new order
-      await Promise.all(
-        ids.map((id, index) =>
-          fetch(`http://localhost:3000/api/columns/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ position: index })
-          })
-        )
-      );
+      // optimistic: reorder columns in the DOM immediately
+      ids.forEach(id => {
+        const col = document.querySelector(`.column[data-id="${id}"]`);
+        if (col) boardArea.appendChild(col);
+      });
 
-      await loadColumns();
+      // single bulk request instead of N parallel PUTs
+      reorderColumns(ids).catch(() => {
+        // if the server call fails, reload to restore correct state
+        loadColumns();
+      });
     });
   });
 }

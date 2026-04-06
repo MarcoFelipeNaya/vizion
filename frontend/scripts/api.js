@@ -53,6 +53,15 @@ async function createColumn(boardId, title) {
   return res.json();
 }
 
+async function reorderColumns(orderedIds) {
+  const res = await fetch(`${API}/columns/reorder`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderedIds })
+  });
+  return res.json();
+}
+
 async function deleteColumn(id) {
   const res = await fetch(`${API}/columns/${id}`, {
     method: 'DELETE',
