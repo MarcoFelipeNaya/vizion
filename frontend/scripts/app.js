@@ -440,19 +440,21 @@ function initDragAndDrop() {
 
   dropZones.forEach(zone => {
     zone.addEventListener('dragover', (e) => {
+      if (!e.dataTransfer.types.includes('cardid')) return;
       e.preventDefault();
-      if (e.dataTransfer.types.includes('cardid')) {
-        zone.classList.add('drag-over');
-      }
+      e.stopPropagation(); // prevent column dragover from firing
+      zone.classList.add('drag-over');
     });
 
-    zone.addEventListener('dragleave', () => {
-      zone.classList.remove('drag-over');
+    zone.addEventListener('dragleave', (e) => {
+      if (!zone.contains(e.relatedTarget)) {
+        zone.classList.remove('drag-over');
+      }
     });
 
     zone.addEventListener('drop', async (e) => {
       e.preventDefault();
-      e.stopPropagation();
+      e.stopPropagation(); // prevent column drop from firing
       zone.classList.remove('drag-over');
       const cardId = e.dataTransfer.getData('cardId');
       if (!cardId) return; // ignore column drops on card zones
@@ -481,10 +483,9 @@ function initDragAndDrop() {
     });
 
     column.addEventListener('dragover', (e) => {
+      // ignore if a card is being dragged — let the drop zone handle it
+      if (e.dataTransfer.types.includes('cardid')) return;
       e.preventDefault();
-      const type = e.dataTransfer.types.includes('columnid');
-      if (!type) return;
-      // only highlight if dragging over a different column
       const draggedId = e.dataTransfer.getData('columnId');
       if (draggedId !== column.dataset.id) {
         column.classList.add('col-drag-over');
@@ -523,7 +524,7 @@ function initDragAndDrop() {
       // update position for each column in the new order
       await Promise.all(
         ids.map((id, index) =>
-          fetch(`${API}/columns/${id}`, {
+          fetch(`http://localhost:3000/api/columns/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ position: index })
