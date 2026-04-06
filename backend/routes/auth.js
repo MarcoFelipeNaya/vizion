@@ -17,14 +17,21 @@ const SALT_ROUNDS = 10; // how many times bcrypt hashes the password
 
 // POST /api/auth/register — create a new account
 router.post('/register', authLimiter, async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email and password are required' });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
+  if (!/[A-Z]/.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one uppercase letter' });
+  }
+  if (!/[0-9]/.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one number' });
   }
 
   try {
@@ -60,13 +67,14 @@ router.post('/register', authLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error' })
   }
 });
 
 // POST /api/auth/login — login with email + password
 router.post('/login', authLimiter, async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
@@ -105,7 +113,7 @@ router.post('/login', authLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error' })
   }
 });
 
