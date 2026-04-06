@@ -1,3 +1,46 @@
+// ── Auth guard ────────────────────────────────────
+// redirects to login if no token found
+
+function checkAuth() {
+  const token = localStorage.getItem('vizion-token');
+  if (!token) {
+    window.location.href = 'login.html';
+    return false;
+  }
+  return true;
+}
+
+function logout() {
+  localStorage.removeItem('vizion-token');
+  localStorage.removeItem('vizion-user');
+  window.location.href = 'login.html';
+}
+
+// show user name and logout button in sidebar
+function renderUserInfo() {
+  const user = JSON.parse(localStorage.getItem('vizion-user'));
+  if (!user) return;
+
+  const sidebarFooter = document.querySelector('.sidebar-footer');
+  sidebarFooter.insertAdjacentHTML('afterbegin', `
+    <div class="user-info">
+      <div class="user-avatar">
+        ${user.name.charAt(0).toUpperCase()}
+      </div>
+      <div class="user-details">
+        <span class="user-name">${user.name}</span>
+        <span class="user-email">${user.email}</span>
+      </div>
+      <button class="btn-icon" id="logoutBtn" title="Logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  `);
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+}
+
+
 // ── State ─────────────────────────────────────────
 // This object holds everything the app needs to remember
 let state = {
@@ -497,5 +540,7 @@ function initDragAndDrop() {
 // This runs when the page loads
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadBoards();
+  if (!checkAuth()) return; // stop if not logged in
+  renderUserInfo();         // show user name in sidebar
+  loadBoards();             // load boards for this user
 });

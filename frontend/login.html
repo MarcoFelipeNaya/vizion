@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vizion — Login</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/auth.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <div class="auth-header">
+      <h1 class="logo">Vizion</h1>
+      <p class="logo-sub">Visual project management</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab">Login</button>
+      <button class="auth-tab" id="registerTab">Register</button>
+    </div>
+
+    <!-- Login form -->
+    <form class="auth-form" id="loginForm">
+      <div class="auth-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="auth-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Your password" required>
+      </div>
+      <div class="auth-message" id="loginMessage"></div>
+      <button type="submit" class="btn-primary auth-btn">
+        <span>Login</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <!-- Register form (hidden by default) -->
+    <form class="auth-form hidden" id="registerForm">
+      <div class="auth-group">
+        <label for="registerName">Name</label>
+        <input type="text" id="registerName" placeholder="Your name" required>
+      </div>
+      <div class="auth-group">
+        <label for="registerEmail">Email</label>
+        <input type="email" id="registerEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="auth-group">
+        <label for="registerPassword">Password</label>
+        <input type="password" id="registerPassword" placeholder="At least 6 characters" required>
+      </div>
+      <div class="auth-message" id="registerMessage"></div>
+      <button type="submit" class="btn-primary auth-btn">
+        <span>Create account</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+  </div>
+
+  <script>
+    // apply saved theme before page loads to prevent flash
+    const theme = localStorage.getItem('vizion-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+  
+  <script src="scripts/config.js"></script>
+  <script src="scripts/auth.js"></script>
+
+</body>
+</html>

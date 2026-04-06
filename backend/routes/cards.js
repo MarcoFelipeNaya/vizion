@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/connection');
+const authMiddleware = require('./middleware/auth');
+
+// protect all card routes
+router.use(authMiddleware);
 
 // POST /api/cards — create a new card
 router.post('/', async (req, res) => {

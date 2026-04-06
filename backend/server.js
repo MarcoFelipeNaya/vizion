@@ -5,6 +5,7 @@ require('dotenv').config();
 const boardRoutes = require('./routes/boards');
 const columnRoutes = require('./routes/columns');
 const cardRoutes = require('./routes/cards');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/boards', boardRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/cards', cardRoutes);
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

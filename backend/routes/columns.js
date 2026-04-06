@@ -1,25 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/connection');
+const authMiddleware = require('./middleware/auth');
 
-// GET /api/columns/:boardId — get all columns for a board (with their cards)
+// protect all column routes
+router.use(authMiddleware);
+
+// GET /api/columns/:boardId — get columns only if board belongs to user
 router.get('/:boardId', async (req, res) => {
   const { boardId } = req.params;
 
   try {
-    // First get all columns for this board
+    // verify board belongs to user first
+    const [boards] = await pool.query(
+      'SELECT id FROM boards WHERE id = ? AND user_id = ?',
+      [boardId, req.user.id]
+    );
+
+    if (boards.length === 0) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+
     const [columns] = await pool.query(
       'SELECT * FROM columns WHERE board_id = ? ORDER BY position ASC',
       [boardId]
     );
 
-    // Then get all cards for each column
     for (const column of columns) {
       const [cards] = await pool.query(
         'SELECT * FROM cards WHERE column_id = ? ORDER BY position ASC',
         [column.id]
       );
-      column.cards = cards; // attach cards directly to the column object
+      column.cards = cards;
     }
 
     res.json(columns);
@@ -28,7 +40,7 @@ router.get('/:boardId', async (req, res) => {
   }
 });
 
-// POST /api/columns — create a new column
+// POST /api/columns — create column (verify board ownership)
 router.post('/', async (req, res) => {
   const { board_id, title } = req.body;
 
@@ -37,7 +49,16 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // Get the highest position in this board so new column goes at the end
+    // verify board belongs to user
+    const [boards] = await pool.query(
+      'SELECT id FROM boards WHERE id = ? AND user_id = ?',
+      [board_id, req.user.id]
+    );
+
+    if (boards.length === 0) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+
     const [rows] = await pool.query(
       'SELECT COUNT(*) as count FROM columns WHERE board_id = ?',
       [board_id]
@@ -55,12 +76,11 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/columns/:id — rename or reposition a column
+// PUT /api/columns/:id — update column
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { title, position } = req.body;
 
-  // allow updating title, position, or both
   if (title === undefined && position === undefined) {
     return res.status(400).json({ error: 'title or position is required' });
   }
@@ -74,6 +94,7 @@ router.put('/:id', async (req, res) => {
     }
 
     const [rows] = await pool.query('SELECT * FROM columns WHERE id = ?', [id]);
+
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Column not found' });
     }
@@ -84,7 +105,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/columns/:id — delete a column
+// DELETE /api/columns/:id — delete column
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
