@@ -4,11 +4,19 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db/connection');
 
+const rateLimit = require('express-rate-limit');
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { error: 'Too many attempts, please try again later' }
+});
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 10; // how many times bcrypt hashes the password
 
 // POST /api/auth/register — create a new account
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -57,7 +65,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login — login with email + password
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
