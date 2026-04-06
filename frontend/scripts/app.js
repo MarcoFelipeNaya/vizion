@@ -523,7 +523,7 @@ function initDragAndDrop() {
       // update position for each column in the new order
       await Promise.all(
         ids.map((id, index) =>
-          fetch(`http://localhost:3000/api/columns/${id}`, {
+          fetch(`${API}/columns/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ position: index })
