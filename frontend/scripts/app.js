@@ -544,3 +544,30 @@ document.addEventListener('DOMContentLoaded', () => {
   renderUserInfo();         // show user name in sidebar
   loadBoards();             // load boards for this user
 });
+
+// ── Mobile sidebar toggle ─────────────────────────
+const hamburger      = document.getElementById('hamburger');
+const sidebar        = document.querySelector('.sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('active');
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('active');
+}
+
+hamburger.addEventListener('click', () => {
+  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+
+// Close sidebar when clicking the overlay
+sidebarOverlay.addEventListener('click', closeSidebar);
+
+// Close sidebar after selecting a board on mobile
+document.getElementById('boardList').addEventListener('click', () => {
+  if (window.innerWidth <= 768) closeSidebar();
+});

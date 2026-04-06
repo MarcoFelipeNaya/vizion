@@ -43,7 +43,12 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <h2 class="board-title" id="boardTitle">Select a board</h2>
+      <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+        <button class="hamburger" id="hamburger" title="Toggle sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h2 class="board-title" id="boardTitle">Select a board</h2>
+      </div>
       <div class="topbar-actions" id="topbarActions"></div>
     </header>
 
@@ -69,6 +74,9 @@
       <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <script>
     const savedTheme = localStorage.getItem('vizion-theme') || 'light';
